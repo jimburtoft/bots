@@ -426,8 +426,10 @@ inSpaceWithOreHoldSelected context seeUndockingComplete inventoryWindowWithOreHo
                                                                     
                                                                         (DescribeBranch " Checking Energy levels for short cycling"
                                                                             (if context.settings.maxEnergyPercent <= (seeUndockingComplete.shipUI.capacitor.levelFromPmarksPercent |> Maybe.withDefault 100) then 
+                                                                            --(if seeUndockingComplete.shipUI.moduleButtonsRows.top |> List.filter (.isActive >> Maybe.withDefault False >> not) |> List.head then
                                                                                DescribeBranch "Deactivating one mining module"
-                                                                                    (case seeUndockingComplete.shipUI.moduleButtonsRows.top |> List.sortBy (.rampRotationMilli) |> List.head of
+                                                                                    --(case seeUndockingComplete.shipUI.moduleButtonsRows.top |> List.sortBy (.rampRotationMilli >> Maybe.withDefault 0 ) |> List.filter ((.rampRotationMilli >> Maybe.withDefault 0) > 0) |> List.tail of
+                                                                                    (case seeUndockingComplete.shipUI.moduleButtonsRows.top |> List.sortBy (.rampRotationMilli >> Maybe.withDefault 0 ) |> List.head of
                                                                                         Just inactiveModule ->
                                                                                             DescribeBranch ("I see an active mining module. Deactivate it." ++ (inactiveModule.rampRotationMilli |> Maybe.withDefault 321 |> String.fromInt) )
                                                                                             (EndDecisionPath
