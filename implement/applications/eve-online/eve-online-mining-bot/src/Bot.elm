@@ -429,9 +429,19 @@ inSpaceWithOreHoldSelected context seeUndockingComplete inventoryWindowWithOreHo
                                                                             --(if seeUndockingComplete.shipUI.moduleButtonsRows.top |> List.filter (.isActive >> Maybe.withDefault False >> not) |> List.head then
                                                                                DescribeBranch "Deactivating one mining module"
                                                                                     --(case seeUndockingComplete.shipUI.moduleButtonsRows.top |> List.sortBy (.rampRotationMilli >> Maybe.withDefault 0 ) |> List.filter ((.rampRotationMilli >> Maybe.withDefault 0) > 0) |> List.tail of
-                                                                                    (case seeUndockingComplete.shipUI.moduleButtonsRows.top |> List.sortBy (.rampRotationMilli >> Maybe.withDefault 0 ) |> List.head of
+                                                                                    --(case seeUndockingComplete.shipUI.moduleButtonsRows.top |> List.filter (.isActive >> Maybe.withDefault False) |>List.sortBy (.rampRotationMilli >> Maybe.withDefault 0 ) |> List.tail of
+                                                                                    --working --(case seeUndockingComplete.shipUI.moduleButtonsRows.top |>List.sortBy (.rampRotationMilli >> Maybe.withDefault 0 ) |> List.head of
+                                                                                    (case seeUndockingComplete.shipUI.moduleButtonsRows.top
+                                                                                        |> List.filterMap (\moduleButton -> moduleButton.rampRotationMilli |> Maybe.map (Tuple.pair moduleButton))
+                                                                                        |> List.sortBy Tuple.second
+                                                                                        |> List.reverse
+                                                                                        |> List.map Tuple.first
+                                                                                        |> List.head of
+
                                                                                         Just inactiveModule ->
-                                                                                            DescribeBranch ("I see an active mining module. Deactivate it." ++ (inactiveModule.rampRotationMilli |> Maybe.withDefault 321 |> String.fromInt) )
+                                                                                            --DescribeBranch ("I see an active mining module. Deactivate it." ++ (inactiveModule.rampRotationMilli |> Maybe.withDefault 321 |> String.fromInt) )
+                                                                                            DescribeBranch ("I see an active mining module. Deactivate it." )
+
                                                                                             (EndDecisionPath
                                                                                                 (actWithoutFurtherReadings
                                                                                                     ( "Click on the module."
@@ -440,7 +450,8 @@ inSpaceWithOreHoldSelected context seeUndockingComplete inventoryWindowWithOreHo
                                                                                                 )
                                                                                             )
                                                                                         Nothing ->
-                                                                                            DescribeBranch "I should never get here" (EndDecisionPath Wait))
+                                                                                            DescribeBranch "I should never get here" (EndDecisionPath Wait)
+                                                                                    )
                                                                                 
                                                                                else                                                                                                                                                             
                                                                                     DescribeBranch "Not enough energy to short cycle"
